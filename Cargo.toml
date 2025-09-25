@@ -2,6 +2,18 @@
 name = "assext"
 version = "0.1.0"
 edition = "2021"
+authors = ["pengwang <your-email@example.com>"]
+description = "Asset文件扩展工具 - 在指定区域生成数字的Spine文件处理工具"
+license = "MIT"
+repository = "https://github.com/yourusername/assext"
+homepage = "https://github.com/yourusername/assext"
+documentation = "https://docs.rs/assext"
+keywords = ["spine", "asset", "image", "gui", "game-development"]
+categories = ["multimedia::images", "development-tools"]
+
+[[bin]]
+name = "assext"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
