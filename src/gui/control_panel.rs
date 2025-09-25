@@ -28,7 +28,7 @@ impl ControlPanel {
 
                 // 上部：确认和取消按钮
                 ui.group(|ui| {
-                    ui.set_min_height(ui.available_height() * 0.2);
+                    ui.set_min_height(100.0); // 设置固定高度，更合适
                     ui.vertical_centered(|ui| {
                         ui.heading("操作");
                         ui.add_space(10.0);
