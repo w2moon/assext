@@ -59,19 +59,21 @@ impl ImageDisplay {
             println!("计算出的显示尺寸: {:?}", display_size);
             println!("图片矩形位置: {:?}", image_rect);
 
-            // 显示图片，使用计算出的尺寸
-            // ui.allocate_ui_at_rect(image_rect, |ui| {
-            //     ui.image(texture);
-            // });
-            // ui.image(texture);
+            // 创建一个响应区域来显示图片并处理交互
+            let image_response = ui.add(egui::Image::new(texture).max_width(available_size.x));
 
-            ui.add(egui::Image::new(texture).max_width(available_size.x));
+            // 获取图片的实际显示区域
+            let actual_image_rect = image_response.rect;
+            println!("图片实际显示区域: {:?}", actual_image_rect);
 
-            // 处理鼠标交互
-            // selection_handler.handle_mouse_interaction(ui, image_rect);
+            // 设置实际的图片显示区域到 selection_handler
+            selection_handler.set_actual_image_rect(actual_image_rect);
 
-            // 绘制选择矩形
-            // selection_handler.draw_selection_rect(ui, image_rect);
+            // 处理鼠标交互 - 使用实际图片显示区域
+            selection_handler.handle_mouse_interaction(ui, actual_image_rect);
+
+            // 绘制选择矩形 - 使用实际图片显示区域
+            selection_handler.draw_selection_rect(ui, actual_image_rect);
         } else {
             ui.label("正在加载图片...");
         }

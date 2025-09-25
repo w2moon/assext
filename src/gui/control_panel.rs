@@ -95,7 +95,7 @@ impl ControlPanel {
 
                 // 显示当前选择信息
                 if let Some((x, y, width, height)) = selection_handler
-                    .get_selection_info(coordinate_calculator, image_display.get_image_size())
+                    .get_selection_info(image_display.get_image_size())
                 {
                     ui.label("选择区域信息:");
                     ui.label(format!("X: {:.0}", x));
