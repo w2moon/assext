@@ -95,66 +95,32 @@ impl SelectionHandler {
     pub fn confirm_selection(
         &mut self,
         ctx: &egui::Context,
-        coordinate_calculator: &CoordinateCalculator,
+        _coordinate_calculator: &CoordinateCalculator,
         image_size: egui::Vec2,
     ) {
-        if let (Some(start), Some(current)) = (self.start_pos, self.current_pos) {
-            println!("开始确认选择: start={:?}, current={:?}", start, current);
+        println!("开始确认选择");
 
-            // 使用与显示时相同的计算方法
-            let available_size = egui::Vec2::new(800.0, 600.0); // 估计的右侧面板大小
-            let (display_size, image_rect) =
-                coordinate_calculator.calculate_image_display(available_size, image_size);
-
-            println!("显示尺寸: {:?}, 图片矩形: {:?}", display_size, image_rect);
-
-            let rect = egui::Rect::from_two_pos(start, current);
-            println!("选择矩形: {:?}", rect);
-
-            // 检查选择是否在图片区域内
-            if !image_rect.contains(rect.min) || !image_rect.contains(rect.max) {
-                println!("选择区域超出图片范围，调整坐标");
-                // 将坐标限制在图片区域内
-                let clamped_rect = egui::Rect::from_min_max(
-                    egui::Pos2::new(
-                        rect.min.x.max(image_rect.min.x).min(image_rect.max.x),
-                        rect.min.y.max(image_rect.min.y).min(image_rect.max.y),
-                    ),
-                    egui::Pos2::new(
-                        rect.max.x.max(image_rect.min.x).min(image_rect.max.x),
-                        rect.max.y.max(image_rect.min.y).min(image_rect.max.y),
-                    ),
-                );
-                println!("调整后的矩形: {:?}", clamped_rect);
-
-                let selected_rect = coordinate_calculator.ui_to_image_coords(
-                    clamped_rect,
-                    image_rect,
-                    display_size,
-                    image_size,
-                    self.text_color,
-                );
-                println!("确认选择: {:?}", selected_rect);
-                *self.selected_rect.lock().unwrap() = Some(selected_rect);
-                ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-            } else {
-                println!("选择区域在图片范围内");
-                let selected_rect = coordinate_calculator.ui_to_image_coords(
-                    rect,
-                    image_rect,
-                    display_size,
-                    image_size,
-                    self.text_color,
-                );
-                println!("确认选择: {:?}", selected_rect);
-                *self.selected_rect.lock().unwrap() = Some(selected_rect);
-                ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-            }
-        } else {
+        // 使用 get_selection_info 获取计算好的矩形坐标
+        if let Some((x, y, width, height)) = self.get_selection_info(image_size) {
             println!(
-                "没有选择区域: start={:?}, current={:?}",
-                self.start_pos, self.current_pos
+                "使用 get_selection_info 的结果: x={:.1}, y={:.1}, w={:.1}, h={:.1}",
+                x, y, width, height
             );
+
+            // 创建 Rect 结构体
+            let selected_rect = crate::gui::Rect {
+                x: x as i32,
+                y: y as i32,
+                width: width as u32,
+                height: height as u32,
+                text_color: self.text_color,
+            };
+
+            println!("确认选择: {:?}", selected_rect);
+            *self.selected_rect.lock().unwrap() = Some(selected_rect);
+            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+        } else {
+            println!("无法获取选择信息，可能没有选择区域或没有设置 actual_image_rect");
         }
     }
 
