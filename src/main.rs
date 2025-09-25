@@ -11,8 +11,8 @@ use gui::RectSelector;
 use image_processor::ImageProcessor;
 
 #[derive(Parser)]
-#[command(name = "spext")]
-#[command(about = "Spine文件扩展工具 - 在指定区域生成数字")]
+#[command(name = "assext")]
+#[command(about = "Asset文件扩展工具 - 在指定区域生成数字")]
 struct Args {
     /// Spine文件路径（不包含扩展名）
     #[arg(help = "Spine文件路径，例如: ./data/lixiaolong")]
@@ -29,8 +29,6 @@ struct Args {
 
 fn main() -> Result<()> {
     let args = Args::parse();
-
-    println!("Spine文件扩展工具启动...");
 
     // 检查Spine文件是否存在
     let atlas_path = format!("{}.atlas", args.spine_path);

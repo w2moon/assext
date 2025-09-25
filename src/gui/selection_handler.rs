@@ -104,10 +104,8 @@ impl SelectionHandler {
                 height: height as u32,
                 text_color: self.text_color,
             };
-
-            *self.selected_rect.lock().unwrap() = Some(selected_rect);
             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-        } else {
+            *self.selected_rect.lock().unwrap() = Some(selected_rect);
         }
     }
 

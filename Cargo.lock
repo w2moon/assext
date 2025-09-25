@@ -235,6 +235,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
 
 [[package]]
+name = "assext"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "eframe",
+ "egui",
+ "image",
+ "imageproc",
+ "rusttype",
+ "walkdir",
+]
+
+[[package]]
 name = "async-broadcast"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2810,20 +2824,6 @@ checksum = "9f7916fc008ca5542385b89a3d3ce689953c143e9304a9bf8beec1de48994c0d"
 dependencies = [
  "libc",
  "winapi",
-]
-
-[[package]]
-name = "spext"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "eframe",
- "egui",
- "image",
- "imageproc",
- "rusttype",
- "walkdir",
 ]
 
 [[package]]

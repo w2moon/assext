@@ -122,7 +122,6 @@ fn setup_custom_fonts(ctx: &egui::Context) {
                     .unwrap()
                     .push("chinese_font".to_owned());
 
-                println!("成功加载中文字体: {}", font_path);
                 break;
             }
         }
