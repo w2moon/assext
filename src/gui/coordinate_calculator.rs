@@ -1,4 +1,4 @@
-use crate::gui::Rect;
+use crate::gui::{Rect, TextDirection};
 use eframe::egui;
 
 pub struct CoordinateCalculator;
@@ -68,6 +68,7 @@ impl CoordinateCalculator {
             text_color,
             enable_color_variation: false,
             base_hue: 0.0,
+            text_direction: TextDirection::Right,
         }
     }
 }

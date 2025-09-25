@@ -12,6 +12,25 @@ use anyhow::Result;
 use eframe::egui;
 use std::sync::{Arc, Mutex};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TextDirection {
+    Up,    // 向上
+    Down,  // 向下
+    Left,  // 向左
+    Right, // 向右
+}
+
+impl TextDirection {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            TextDirection::Up => "向上",
+            TextDirection::Down => "向下",
+            TextDirection::Left => "向左",
+            TextDirection::Right => "向右",
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Rect {
     pub x: i32,
@@ -21,6 +40,7 @@ pub struct Rect {
     pub text_color: egui::Color32,
     pub enable_color_variation: bool,
     pub base_hue: f32,
+    pub text_direction: TextDirection,
 }
 
 pub struct RectSelector {

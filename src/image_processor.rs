@@ -1,6 +1,6 @@
-use crate::gui::Rect;
+use crate::gui::{Rect, TextDirection};
 use anyhow::Result;
-use image::{DynamicImage, Rgba};
+use image::{DynamicImage, Rgba, RgbaImage};
 use imageproc::drawing::draw_text_mut;
 use rusttype::{Font, Scale};
 use std::path::Path;
@@ -44,26 +44,8 @@ impl ImageProcessor {
             .load_system_font()
             .ok_or_else(|| anyhow::anyhow!("无法加载字体"))?;
 
-        // 计算文字位置（居中）
-        let scale = Scale::uniform(font_size);
-        let text_width = self.measure_text_width(text, &font, scale);
-        let text_height = font.v_metrics(scale).ascent - font.v_metrics(scale).descent;
-
-        let text_x = rect.x + (rect.width as i32 - text_width as i32) / 2;
-        let text_y = rect.y + (rect.height as i32 - text_height as i32) / 2;
-
-        // 绘制文字
-        let color = rect.text_color;
-
-        draw_text_mut(
-            &mut rgba_img,
-            Rgba([color.r(), color.g(), color.b(), 255]), // 使用选择的颜色
-            text_x,
-            text_y,
-            scale,
-            &font,
-            text,
-        );
+        // 根据文字朝向绘制文字
+        self.draw_text_with_direction(&mut rgba_img, text, &font, font_size, rect, rect.text_color);
 
         // 应用颜色变化
         if enable_color_variation {
@@ -166,6 +148,147 @@ impl ImageProcessor {
             pixel[1] = (new_g * 255.0) as u8;
             pixel[2] = (new_b * 255.0) as u8;
             // pixel[3] 保持原始alpha值不变
+        }
+    }
+
+    fn draw_text_with_direction(
+        &self,
+        rgba_img: &mut RgbaImage,
+        text: &str,
+        font: &Font,
+        font_size: f32,
+        rect: &Rect,
+        color: egui::Color32,
+    ) {
+        let scale = Scale::uniform(font_size);
+        let text_width = self.measure_text_width(text, font, scale);
+        let text_height = font.v_metrics(scale).ascent - font.v_metrics(scale).descent;
+
+        match rect.text_direction {
+            TextDirection::Down => {
+                // 向右（水平，正常方向）
+                let text_x = rect.x + (rect.width as i32 - text_width as i32) / 2;
+                let text_y = rect.y + (rect.height as i32 - text_height as i32) / 2;
+
+                draw_text_mut(
+                    rgba_img,
+                    Rgba([color.r(), color.g(), color.b(), 255]),
+                    text_x,
+                    text_y,
+                    scale,
+                    font,
+                    text,
+                );
+            }
+            TextDirection::Up => {
+                // 向左（水平，180度旋转）
+                let text_x = rect.x + (rect.width as i32 - text_width as i32) / 2;
+                let text_y = rect.y + (rect.height as i32 - text_height as i32) / 2;
+
+                self.draw_rotated_text(rgba_img, text, font, scale, text_x, text_y, 180.0, color);
+            }
+            TextDirection::Right => {
+                // 向上（垂直，270度旋转）
+                let text_x = rect.x + (rect.width as i32 - text_height as i32) / 2;
+                let text_y = rect.y + (rect.height as i32 - text_width as i32) / 2;
+
+                self.draw_rotated_text(rgba_img, text, font, scale, text_x, text_y, 270.0, color);
+            }
+            TextDirection::Left => {
+                // 向下（垂直，90度旋转）
+                let text_x = rect.x + (rect.width as i32 - text_height as i32) / 2;
+                let text_y = rect.y + (rect.height as i32 - text_width as i32) / 2;
+
+                self.draw_rotated_text(rgba_img, text, font, scale, text_x, text_y, 90.0, color);
+            }
+        }
+    }
+
+    fn draw_rotated_text(
+        &self,
+        rgba_img: &mut RgbaImage,
+        text: &str,
+        font: &Font,
+        scale: Scale,
+        center_x: i32,
+        center_y: i32,
+        angle_degrees: f32,
+        color: egui::Color32,
+    ) {
+        // 创建一个临时图片来绘制文字
+        let text_width = self.measure_text_width(text, font, scale) as u32;
+        let text_height = (font.v_metrics(scale).ascent - font.v_metrics(scale).descent) as u32;
+
+        // 添加一些边距
+        let margin = 10;
+        let temp_width = text_width + margin * 2;
+        let temp_height = text_height + margin * 2;
+
+        let mut temp_img = RgbaImage::new(temp_width, temp_height);
+
+        // 在临时图片上绘制文字
+        draw_text_mut(
+            &mut temp_img,
+            Rgba([color.r(), color.g(), color.b(), 255]),
+            margin as i32,
+            margin as i32,
+            scale,
+            font,
+            text,
+        );
+
+        // 将临时图片旋转并复制到目标图片
+        self.copy_rotated_image(rgba_img, &temp_img, center_x, center_y, angle_degrees);
+    }
+
+    fn copy_rotated_image(
+        &self,
+        target: &mut RgbaImage,
+        source: &RgbaImage,
+        center_x: i32,
+        center_y: i32,
+        angle_degrees: f32,
+    ) {
+        let angle_rad = angle_degrees.to_radians();
+        let cos_angle = angle_rad.cos();
+        let sin_angle = angle_rad.sin();
+
+        let source_width = source.width() as i32;
+        let source_height = source.height() as i32;
+        let target_width = target.width() as i32;
+        let target_height = target.height() as i32;
+
+        // 计算旋转后的边界
+        let half_width = source_width / 2;
+        let half_height = source_height / 2;
+
+        for y in 0..source_height {
+            for x in 0..source_width {
+                // 相对于中心的坐标
+                let rel_x = x - half_width;
+                let rel_y = y - half_height;
+
+                // 应用旋转变换
+                let new_x = (rel_x as f32 * cos_angle - rel_y as f32 * sin_angle) as i32;
+                let new_y = (rel_x as f32 * sin_angle + rel_y as f32 * cos_angle) as i32;
+
+                // 计算在目标图片中的位置
+                let target_x = center_x + new_x;
+                let target_y = center_y + new_y;
+
+                // 检查边界
+                if target_x >= 0
+                    && target_x < target_width
+                    && target_y >= 0
+                    && target_y < target_height
+                {
+                    let source_pixel = source.get_pixel(x as u32, y as u32);
+                    if source_pixel[3] > 0 {
+                        // 只复制非透明像素
+                        target.put_pixel(target_x as u32, target_y as u32, *source_pixel);
+                    }
+                }
+            }
         }
     }
 }

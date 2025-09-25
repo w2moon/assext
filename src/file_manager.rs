@@ -5,13 +5,15 @@ use std::path::Path;
 pub struct FileManager {
     output_dir: String,
     spine_name: String,
+    is_single_image_mode: bool,
 }
 
 impl FileManager {
-    pub fn new(output_dir: &str, spine_name: &str) -> Self {
+    pub fn new(output_dir: &str, spine_name: &str, is_single_image_mode: bool) -> Self {
         Self {
             output_dir: output_dir.to_string(),
             spine_name: spine_name.to_string(),
+            is_single_image_mode,
         }
     }
 
@@ -19,6 +21,11 @@ impl FileManager {
         // 创建输出根目录
         if !Path::new(&self.output_dir).exists() {
             fs::create_dir_all(&self.output_dir)?;
+        }
+
+        // 如果是单图片模式，不需要创建子目录
+        if self.is_single_image_mode {
+            return Ok(());
         }
 
         // 创建每个子目录
@@ -48,6 +55,11 @@ impl FileManager {
         has_atlas: bool,
         has_skel: bool,
     ) -> Result<()> {
+        // 如果是单图片模式，不需要复制任何文件
+        if self.is_single_image_mode {
+            return Ok(());
+        }
+
         let target_dir = format!("{}/{}", self.output_dir, dir_name);
 
         // 如果atlas文件存在，则复制

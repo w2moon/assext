@@ -1,4 +1,4 @@
-use crate::gui::{CoordinateCalculator, ImageDisplay, SelectionHandler};
+use crate::gui::{CoordinateCalculator, ImageDisplay, SelectionHandler, TextDirection};
 use eframe::egui;
 
 pub struct ControlPanel;
@@ -94,9 +94,75 @@ impl ControlPanel {
                                 ui.label(format!("X: {:.0}, Y: {:.0}", x, y));
                                 ui.label(format!("宽度: {:.0}, 高度: {:.0}", width, height));
                             }
+
+                            ui.add_space(10.0);
+
+                            // 文字朝向选择
+                            ui.horizontal(|ui| {
+                                ui.label("文字朝向:");
+                                let mut current_direction = selection_handler.get_text_direction();
+                                egui::ComboBox::from_id_source("text_direction")
+                                    .selected_text(current_direction.as_str())
+                                    .show_ui(ui, |ui| {
+                                        ui.selectable_value(
+                                            &mut current_direction,
+                                            TextDirection::Up,
+                                            "向上",
+                                        );
+                                        ui.selectable_value(
+                                            &mut current_direction,
+                                            TextDirection::Down,
+                                            "向下",
+                                        );
+                                        ui.selectable_value(
+                                            &mut current_direction,
+                                            TextDirection::Left,
+                                            "向左",
+                                        );
+                                        ui.selectable_value(
+                                            &mut current_direction,
+                                            TextDirection::Right,
+                                            "向右",
+                                        );
+                                    });
+                                selection_handler.set_text_direction(current_direction);
+                            });
                         } else {
                             ui.add_space(10.0);
                             ui.label("将使用整个图片区域");
+
+                            ui.add_space(10.0);
+
+                            // 文字朝向选择（即使没有选择框也显示）
+                            ui.horizontal(|ui| {
+                                ui.label("文字朝向:");
+                                let mut current_direction = selection_handler.get_text_direction();
+                                egui::ComboBox::from_id_source("text_direction")
+                                    .selected_text(current_direction.as_str())
+                                    .show_ui(ui, |ui| {
+                                        ui.selectable_value(
+                                            &mut current_direction,
+                                            TextDirection::Up,
+                                            "向上",
+                                        );
+                                        ui.selectable_value(
+                                            &mut current_direction,
+                                            TextDirection::Down,
+                                            "向下",
+                                        );
+                                        ui.selectable_value(
+                                            &mut current_direction,
+                                            TextDirection::Left,
+                                            "向左",
+                                        );
+                                        ui.selectable_value(
+                                            &mut current_direction,
+                                            TextDirection::Right,
+                                            "向右",
+                                        );
+                                    });
+                                selection_handler.set_text_direction(current_direction);
+                            });
                         }
                     });
                 });

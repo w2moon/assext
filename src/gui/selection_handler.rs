@@ -1,4 +1,4 @@
-use crate::gui::{CoordinateCalculator, Rect};
+use crate::gui::{CoordinateCalculator, Rect, TextDirection};
 use eframe::egui;
 use std::sync::{Arc, Mutex};
 
@@ -12,6 +12,7 @@ pub struct SelectionHandler {
     // 新增字段
     enable_selection: bool,
     enable_color_variation: bool,
+    text_direction: TextDirection,
 }
 
 impl SelectionHandler {
@@ -25,6 +26,7 @@ impl SelectionHandler {
             actual_image_rect: None,
             enable_selection: true,
             enable_color_variation: true,
+            text_direction: TextDirection::Right,
         }
     }
 
@@ -111,6 +113,7 @@ impl SelectionHandler {
                     text_color: self.text_color,
                     enable_color_variation: self.enable_color_variation,
                     base_hue: 0.0, // 不再使用，设为0.0
+                    text_direction: self.text_direction,
                 };
                 *self.selected_rect.lock().unwrap() = Some(selected_rect);
             }
@@ -124,6 +127,7 @@ impl SelectionHandler {
                 text_color: self.text_color,
                 enable_color_variation: self.enable_color_variation,
                 base_hue: 0.0, // 不再使用，设为0.0
+                text_direction: self.text_direction,
             };
             *self.selected_rect.lock().unwrap() = Some(default_rect);
         }
@@ -207,5 +211,13 @@ impl SelectionHandler {
 
     pub fn get_enable_color_variation(&self) -> bool {
         self.enable_color_variation
+    }
+
+    pub fn set_text_direction(&mut self, direction: TextDirection) {
+        self.text_direction = direction;
+    }
+
+    pub fn get_text_direction(&self) -> TextDirection {
+        self.text_direction
     }
 }
