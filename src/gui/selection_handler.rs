@@ -41,7 +41,6 @@ impl SelectionHandler {
                 self.is_selecting = true;
                 self.start_pos = Some(pointer_pos);
                 self.current_pos = Some(pointer_pos);
-                println!("开始选择: {:?}", pointer_pos);
             }
         }
 
@@ -52,17 +51,14 @@ impl SelectionHandler {
                     // 如果还没有开始选择，现在开始
                     self.is_selecting = true;
                     self.start_pos = Some(pointer_pos);
-                    println!("直接拖拽开始选择: {:?}", pointer_pos);
                 }
                 self.current_pos = Some(pointer_pos);
-                println!("拖拽中: {:?}", pointer_pos);
             }
         }
 
         // 拖拽释放时结束选择
         if response.drag_released() && self.is_selecting {
             self.is_selecting = false;
-            println!("拖拽结束，完成选择");
         }
     }
 
@@ -98,15 +94,8 @@ impl SelectionHandler {
         _coordinate_calculator: &CoordinateCalculator,
         image_size: egui::Vec2,
     ) {
-        println!("开始确认选择");
-
         // 使用 get_selection_info 获取计算好的矩形坐标
         if let Some((x, y, width, height)) = self.get_selection_info(image_size) {
-            println!(
-                "使用 get_selection_info 的结果: x={:.1}, y={:.1}, w={:.1}, h={:.1}",
-                x, y, width, height
-            );
-
             // 创建 Rect 结构体
             let selected_rect = crate::gui::Rect {
                 x: x as i32,
@@ -116,11 +105,9 @@ impl SelectionHandler {
                 text_color: self.text_color,
             };
 
-            println!("确认选择: {:?}", selected_rect);
             *self.selected_rect.lock().unwrap() = Some(selected_rect);
             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
         } else {
-            println!("无法获取选择信息，可能没有选择区域或没有设置 actual_image_rect");
         }
     }
 
@@ -139,26 +126,13 @@ impl SelectionHandler {
     }
 
     pub fn get_selection_info(&self, image_size: egui::Vec2) -> Option<(f32, f32, f32, f32)> {
-        println!("get_selection_info - image_size: {:?}", image_size);
-
         if let Some(actual_image_rect) = self.actual_image_rect {
-            println!(
-                "get_selection_info - actual_image_rect: {:?}",
-                actual_image_rect
-            );
-
             if let (Some(start), Some(current)) = (self.start_pos, self.current_pos) {
                 let selection_rect = egui::Rect::from_two_pos(start, current);
-                println!("get_selection_info - selection_rect: {:?}", selection_rect);
 
                 // 计算缩放比例：原始图片尺寸 / 实际显示尺寸
                 let scale_x = image_size.x / actual_image_rect.width();
                 let scale_y = image_size.y / actual_image_rect.height();
-
-                println!(
-                    "get_selection_info - scale_x: {}, scale_y: {}",
-                    scale_x, scale_y
-                );
 
                 // 将选择框坐标转换为相对于图片显示区域的坐标
                 let relative_x = (selection_rect.min.x - actual_image_rect.min.x).max(0.0);
@@ -169,11 +143,6 @@ impl SelectionHandler {
                 let relative_height = selection_rect
                     .height()
                     .min(actual_image_rect.height() - relative_y);
-
-                println!(
-                    "get_selection_info - 相对坐标: x={:.1}, y={:.1}, w={:.1}, h={:.1}",
-                    relative_x, relative_y, relative_width, relative_height
-                );
 
                 // 转换为原始图片坐标
                 let image_x = (relative_x * scale_x).max(0.0).min(image_size.x - 1.0);
@@ -187,17 +156,11 @@ impl SelectionHandler {
 
                 let result = (image_x, image_y, image_width, image_height);
 
-                println!(
-                    "get_selection_info - 最终结果: x={:.1}, y={:.1}, w={:.1}, h={:.1}",
-                    result.0, result.1, result.2, result.3
-                );
-
                 Some(result)
             } else {
                 None
             }
         } else {
-            println!("get_selection_info - 没有设置 actual_image_rect");
             None
         }
     }

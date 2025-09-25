@@ -31,9 +31,6 @@ fn main() -> Result<()> {
     let args = Args::parse();
 
     println!("Spine文件扩展工具启动...");
-    println!("Spine路径: {}", args.spine_path);
-    println!("输出目录: {}", args.output_dir);
-    println!("生成数量: {}", args.count);
 
     // 检查Spine文件是否存在
     let atlas_path = format!("{}.atlas", args.spine_path);
@@ -58,7 +55,6 @@ fn main() -> Result<()> {
         .to_string();
 
     // 打开GUI选择矩形区域
-    println!("正在打开图片选择窗口...");
 
     // 临时测试：使用固定矩形区域
     let rect = RectSelector::select_rect(&png_path)?;
@@ -76,10 +72,16 @@ fn main() -> Result<()> {
     let image_processor = ImageProcessor::new(&png_path);
 
     for i in 1..=args.count {
-        let dir_name = format!("{}_{:02}", spine_name, i);
-        let number_text = format!("{:02}", i);
-
-        println!("处理目录: {}", dir_name);
+        // 根据数量决定数字格式：超过99个使用3位数字，否则使用2位数字
+        let (dir_name, number_text) = if args.count > 99 {
+            // 3位数字格式：001, 002, 003...
+            let formatted_num = format!("{:03}", i);
+            (format!("{}_{}", spine_name, formatted_num), formatted_num)
+        } else {
+            // 2位数字格式：01, 02, 03...
+            let formatted_num = format!("{:02}", i);
+            (format!("{}_{}", spine_name, formatted_num), formatted_num)
+        };
 
         // 复制文件
         file_manager.copy_spine_files(&dir_name, &atlas_path, &png_path, &skel_path)?;

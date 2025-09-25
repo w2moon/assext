@@ -18,18 +18,6 @@ impl ImageProcessor {
     }
 
     pub fn draw_text_in_rect(&self, output_path: &str, text: &str, rect: &Rect) -> Result<()> {
-        println!("绘制数字 - 文本: '{}', 输出路径: '{}'", text, output_path);
-        println!(
-            "绘制数字 - rect: x={}, y={}, width={}, height={}, color=RGB({},{},{})",
-            rect.x,
-            rect.y,
-            rect.width,
-            rect.height,
-            rect.text_color.r(),
-            rect.text_color.g(),
-            rect.text_color.b()
-        );
-
         // 克隆原始图片
         let img = self.original_image.clone();
 
@@ -38,7 +26,6 @@ impl ImageProcessor {
 
         // 计算文字大小，使其适合矩形区域
         let font_size = self.calculate_font_size(text, rect.width, rect.height);
-        println!("绘制数字 - 计算出的字体大小: {:.1}", font_size);
 
         // 加载系统字体
         let font = self
@@ -52,12 +39,6 @@ impl ImageProcessor {
 
         let text_x = rect.x + (rect.width as i32 - text_width as i32) / 2;
         let text_y = rect.y + (rect.height as i32 - text_height as i32) / 2;
-
-        println!(
-            "绘制数字 - 文字尺寸: width={:.1}, height={:.1}",
-            text_width, text_height
-        );
-        println!("绘制数字 - 文字位置: x={}, y={}", text_x, text_y);
 
         // 绘制文字
         let color = rect.text_color;
@@ -75,8 +56,6 @@ impl ImageProcessor {
         // 保存图片
         let final_img = DynamicImage::ImageRgba8(rgba_img);
         final_img.save(output_path)?;
-
-        println!("绘制数字 - 完成！已保存到: {}", output_path);
 
         Ok(())
     }
