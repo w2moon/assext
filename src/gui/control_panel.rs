@@ -22,87 +22,137 @@ impl ControlPanel {
             .min_width(250.0)
             .max_width(400.0)
             .show(ctx, |ui| {
-                // 状态显示
-                if selection_handler.is_selecting() {
-                    ui.label("✅ 正在选择矩形区域...");
-                }
+                // 上部：确认和取消按钮
+                ui.group(|ui| {
+                    ui.set_min_height(ui.available_height() * 0.2);
+                    ui.vertical_centered(|ui| {
+                        ui.heading("操作");
+                        ui.add_space(10.0);
 
-                if selection_handler.has_selection() {
-                    ui.label("✅ 已选择矩形区域，请点击下方按钮确认");
-                } else {
-                    ui.label("请先在图片上拖拽选择矩形区域");
-                }
+                        ui.horizontal(|ui| {
+                            if ui
+                                .add_sized(
+                                    [ui.available_width() * 0.45, 40.0],
+                                    egui::Button::new("✅ 确认"),
+                                )
+                                .clicked()
+                            {
+                                selection_handler.confirm_selection(
+                                    ctx,
+                                    coordinate_calculator,
+                                    image_display.get_image_size(),
+                                );
+                            }
 
-                ui.separator();
-
-                // 颜色选择区域
-                ui.label("文字颜色:");
-                ui.horizontal(|ui| {
-                    let mut text_color = selection_handler.get_text_color();
-                    egui::color_picker::color_picker_color32(
-                        ui,
-                        &mut text_color,
-                        egui::color_picker::Alpha::Opaque,
-                    );
-                    selection_handler.set_text_color(text_color);
-                    ui.label(format!(
-                        "RGB({}, {}, {})",
-                        text_color.r(),
-                        text_color.g(),
-                        text_color.b()
-                    ));
+                            if ui
+                                .add_sized(
+                                    [ui.available_width() * 0.45, 40.0],
+                                    egui::Button::new("❌ 取消"),
+                                )
+                                .clicked()
+                            {
+                                ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                            }
+                        });
+                    });
                 });
 
-                ui.separator();
+                ui.add_space(10.0);
 
-                // 按钮区域
-                ui.vertical(|ui| {
-                    if selection_handler.has_selection() {
-                        if ui
-                            .add_sized(
-                                [ui.available_width(), 40.0],
-                                egui::Button::new("✅ 确认选择"),
-                            )
-                            .clicked()
-                        {
-                            selection_handler.confirm_selection(
-                                ctx,
-                                coordinate_calculator,
-                                image_display.get_image_size(),
+                // 中部：选择框区域
+                ui.group(|ui| {
+                    ui.set_min_height(ui.available_height() * 0.25);
+                    ui.vertical(|ui| {
+                        ui.heading("选择区域");
+                        ui.add_space(10.0);
+
+                        // 选择框开关
+                        ui.horizontal(|ui| {
+                            let mut enable_selection = selection_handler.get_enable_selection();
+                            ui.checkbox(&mut enable_selection, "启用选择框");
+                            selection_handler.set_enable_selection(enable_selection);
+                        });
+
+                        if selection_handler.get_enable_selection() {
+                            ui.add_space(10.0);
+
+                            // 状态显示
+                            if selection_handler.is_selecting() {
+                                ui.label("✅ 正在选择矩形区域...");
+                            } else if selection_handler.has_selection() {
+                                ui.label("✅ 已选择矩形区域");
+                            } else {
+                                ui.label("请先在图片上拖拽选择矩形区域");
+                            }
+
+                            // 显示当前选择信息
+                            if let Some((x, y, width, height)) =
+                                selection_handler.get_selection_info(image_display.get_image_size())
+                            {
+                                ui.add_space(5.0);
+                                ui.label("选择区域信息:");
+                                ui.label(format!("X: {:.0}, Y: {:.0}", x, y));
+                                ui.label(format!("宽度: {:.0}, 高度: {:.0}", width, height));
+                            }
+                        } else {
+                            ui.add_space(10.0);
+                            ui.label("将使用整个图片区域");
+                        }
+                    });
+                });
+
+                ui.add_space(10.0);
+
+                // 文字颜色选择区域
+                ui.group(|ui| {
+                    ui.vertical(|ui| {
+                        ui.heading("文字颜色");
+                        ui.add_space(10.0);
+
+                        ui.horizontal(|ui| {
+                            let mut text_color = selection_handler.get_text_color();
+                            egui::color_picker::color_picker_color32(
+                                ui,
+                                &mut text_color,
+                                egui::color_picker::Alpha::Opaque,
                             );
-                        }
-
-                        if ui
-                            .add_sized(
-                                [ui.available_width(), 40.0],
-                                egui::Button::new("🔄 重置选择"),
-                            )
-                            .clicked()
-                        {
-                            selection_handler.reset_selection();
-                        }
-                    }
-
-                    if ui
-                        .add_sized([ui.available_width(), 40.0], egui::Button::new("❌ 取消"))
-                        .clicked()
-                    {
-                        ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-                    }
+                            selection_handler.set_text_color(text_color);
+                            ui.label(format!(
+                                "RGB({}, {}, {})",
+                                text_color.r(),
+                                text_color.g(),
+                                text_color.b()
+                            ));
+                        });
+                    });
                 });
 
-                ui.separator();
+                ui.add_space(10.0);
 
-                // 显示当前选择信息
-                if let Some((x, y, width, height)) =
-                    selection_handler.get_selection_info(image_display.get_image_size())
-                {
-                    ui.label("选择区域信息:");
-                    ui.label(format!("X: {:.0}", x));
-                    ui.label(format!("Y: {:.0}", y));
-                    ui.label(format!("宽度: {:.0}", width));
-                    ui.label(format!("高度: {:.0}", height));
-                }
+                // 下部：颜色变化区域
+                ui.group(|ui| {
+                    ui.vertical(|ui| {
+                        ui.heading("颜色变化");
+                        ui.add_space(10.0);
+
+                        // 颜色变化开关
+                        ui.horizontal(|ui| {
+                            let mut enable_color_variation =
+                                selection_handler.get_enable_color_variation();
+                            ui.checkbox(&mut enable_color_variation, "启用颜色变化");
+                            selection_handler.set_enable_color_variation(enable_color_variation);
+                        });
+
+                        if selection_handler.get_enable_color_variation() {
+                            ui.add_space(10.0);
+                            ui.label("每个生成的图片将自动叠加不同的HSL颜色");
+                            ui.label("颜色将根据图片数量均匀分布");
+                        } else {
+                            ui.add_space(10.0);
+                            ui.label("将使用原始图片颜色");
+                        }
+                    });
+                });
             });
     }
 }

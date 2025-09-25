@@ -9,6 +9,9 @@ pub struct SelectionHandler {
     text_color: egui::Color32,
     selected_rect: Arc<Mutex<Option<Rect>>>,
     actual_image_rect: Option<egui::Rect>,
+    // 新增字段
+    enable_selection: bool,
+    enable_color_variation: bool,
 }
 
 impl SelectionHandler {
@@ -20,6 +23,8 @@ impl SelectionHandler {
             text_color: egui::Color32::BLACK,
             selected_rect,
             actual_image_rect: None,
+            enable_selection: true,
+            enable_color_variation: true,
         }
     }
 
@@ -94,19 +99,35 @@ impl SelectionHandler {
         _coordinate_calculator: &CoordinateCalculator,
         image_size: egui::Vec2,
     ) {
-        // 使用 get_selection_info 获取计算好的矩形坐标
-        if let Some((x, y, width, height)) = self.get_selection_info(image_size) {
-            // 创建 Rect 结构体
-            let selected_rect = crate::gui::Rect {
-                x: x as i32,
-                y: y as i32,
-                width: width as u32,
-                height: height as u32,
+        if self.enable_selection {
+            // 使用 get_selection_info 获取计算好的矩形坐标
+            if let Some((x, y, width, height)) = self.get_selection_info(image_size) {
+                // 创建 Rect 结构体
+                let selected_rect = crate::gui::Rect {
+                    x: x as i32,
+                    y: y as i32,
+                    width: width as u32,
+                    height: height as u32,
+                    text_color: self.text_color,
+                    enable_color_variation: self.enable_color_variation,
+                    base_hue: 0.0, // 不再使用，设为0.0
+                };
+                *self.selected_rect.lock().unwrap() = Some(selected_rect);
+            }
+        } else {
+            // 如果没有启用选择，创建一个默认的矩形（整个图片）
+            let default_rect = crate::gui::Rect {
+                x: 0,
+                y: 0,
+                width: image_size.x as u32,
+                height: image_size.y as u32,
                 text_color: self.text_color,
+                enable_color_variation: self.enable_color_variation,
+                base_hue: 0.0, // 不再使用，设为0.0
             };
-            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-            *self.selected_rect.lock().unwrap() = Some(selected_rect);
+            *self.selected_rect.lock().unwrap() = Some(default_rect);
         }
+        ctx.send_viewport_cmd(egui::ViewportCommand::Close);
     }
 
     pub fn reset_selection(&mut self) {
@@ -170,4 +191,22 @@ impl SelectionHandler {
     pub fn get_text_color(&self) -> egui::Color32 {
         self.text_color
     }
+
+    // 新增方法
+    pub fn set_enable_selection(&mut self, enable: bool) {
+        self.enable_selection = enable;
+    }
+
+    pub fn get_enable_selection(&self) -> bool {
+        self.enable_selection
+    }
+
+    pub fn set_enable_color_variation(&mut self, enable: bool) {
+        self.enable_color_variation = enable;
+    }
+
+    pub fn get_enable_color_variation(&self) -> bool {
+        self.enable_color_variation
+    }
+
 }

@@ -66,6 +66,8 @@ impl CoordinateCalculator {
             width: image_rect_width as u32,
             height: image_rect_height as u32,
             text_color,
+            enable_color_variation: false,
+            base_hue: 0.0,
         }
     }
 }

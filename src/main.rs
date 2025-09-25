@@ -85,7 +85,14 @@ fn main() -> Result<()> {
 
         // 在PNG上绘制数字
         let output_png_path = format!("{}/{}/{}.png", args.output_dir, dir_name, spine_name);
-        image_processor.draw_text_in_rect(&output_png_path, &number_text, &rect)?;
+        image_processor.draw_text_in_rect_with_color_variation(
+            &output_png_path, 
+            &number_text, 
+            &rect, 
+            rect.enable_color_variation, 
+            0.0, // base_hue 不再使用，传递0.0
+            i
+        )?;
     }
 
     println!("处理完成！生成了 {} 个目录。", args.count);

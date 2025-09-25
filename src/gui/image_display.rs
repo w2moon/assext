@@ -55,11 +55,14 @@ impl ImageDisplay {
             // 设置实际的图片显示区域到 selection_handler
             selection_handler.set_actual_image_rect(actual_image_rect);
 
-            // 处理鼠标交互 - 使用实际图片显示区域
-            selection_handler.handle_mouse_interaction(ui, actual_image_rect);
+            // 只有在启用选择框时才处理鼠标交互和绘制选择矩形
+            if selection_handler.get_enable_selection() {
+                // 处理鼠标交互 - 使用实际图片显示区域
+                selection_handler.handle_mouse_interaction(ui, actual_image_rect);
 
-            // 绘制选择矩形 - 使用实际图片显示区域
-            selection_handler.draw_selection_rect(ui, actual_image_rect);
+                // 绘制选择矩形 - 使用实际图片显示区域
+                selection_handler.draw_selection_rect(ui, actual_image_rect);
+            }
         } else {
             ui.label("正在加载图片...");
         }

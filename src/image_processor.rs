@@ -18,6 +18,18 @@ impl ImageProcessor {
     }
 
     pub fn draw_text_in_rect(&self, output_path: &str, text: &str, rect: &Rect) -> Result<()> {
+        self.draw_text_in_rect_with_color_variation(output_path, text, rect, false, 0.0, 0)
+    }
+
+    pub fn draw_text_in_rect_with_color_variation(
+        &self,
+        output_path: &str,
+        text: &str,
+        rect: &Rect,
+        enable_color_variation: bool,
+        base_hue: f32,
+        index: u32,
+    ) -> Result<()> {
         // 克隆原始图片
         let img = self.original_image.clone();
 
@@ -52,6 +64,11 @@ impl ImageProcessor {
             &font,
             text,
         );
+
+        // 应用颜色变化
+        if enable_color_variation {
+            self.apply_color_variation(&mut rgba_img, base_hue, index);
+        }
 
         // 保存图片
         let final_img = DynamicImage::ImageRgba8(rgba_img);
@@ -106,5 +123,49 @@ impl ImageProcessor {
         }
 
         None
+    }
+
+    fn apply_color_variation(&self, rgba_img: &mut image::RgbaImage, _base_hue: f32, index: u32) {
+        // 根据图片索引自动生成色调，均匀分布在360度色环上
+        // 使用黄金比例来获得更好的颜色分布
+        let golden_ratio = 1.618033988749895;
+        let current_hue = (index as f32 * 360.0 * golden_ratio) % 360.0;
+
+        // 将色调转换为弧度
+        let hue_rad = current_hue.to_radians();
+
+        // 计算RGB通道的色调偏移
+
+        // 对每个像素应用颜色变化
+        for pixel in rgba_img.pixels_mut() {
+            let r = pixel[0] as f32 / 255.0;
+            let g = pixel[1] as f32 / 255.0;
+            let b = pixel[2] as f32 / 255.0;
+
+            // 计算亮度（用于保持原始亮度）
+            let brightness = (r + g + b) / 3.0;
+
+            // 如果像素太暗或太亮，跳过处理
+            if brightness < 0.1 || brightness > 0.9 {
+                continue;
+            }
+
+            // 应用色调变化到RGB通道
+            // 使用不同的相位偏移来创建更丰富的颜色变化
+            let r_phase = hue_rad;
+            let g_phase = hue_rad + 2.0943951023931953; // +120度
+            let b_phase = hue_rad + 4.1887902047863905; // +240度
+
+            // 计算新的RGB值，保持原始亮度
+            let new_r = (brightness + 0.3 * r_phase.cos()).clamp(0.0, 1.0);
+            let new_g = (brightness + 0.3 * g_phase.cos()).clamp(0.0, 1.0);
+            let new_b = (brightness + 0.3 * b_phase.cos()).clamp(0.0, 1.0);
+
+            // 应用颜色变化，但保持原始像素的透明度
+            pixel[0] = (new_r * 255.0) as u8;
+            pixel[1] = (new_g * 255.0) as u8;
+            pixel[2] = (new_b * 255.0) as u8;
+            // pixel[3] 保持原始alpha值不变
+        }
     }
 }

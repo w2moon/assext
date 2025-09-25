@@ -19,6 +19,8 @@ pub struct Rect {
     pub width: u32,
     pub height: u32,
     pub text_color: egui::Color32,
+    pub enable_color_variation: bool,
+    pub base_hue: f32,
 }
 
 pub struct RectSelector {
