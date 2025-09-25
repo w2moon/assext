@@ -208,5 +208,4 @@ impl SelectionHandler {
     pub fn get_enable_color_variation(&self) -> bool {
         self.enable_color_variation
     }
-
 }
