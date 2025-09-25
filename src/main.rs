@@ -30,20 +30,19 @@ struct Args {
 fn main() -> Result<()> {
     let args = Args::parse();
 
-    // 检查Spine文件是否存在
+    // 检查文件是否存在
     let atlas_path = format!("{}.atlas", args.spine_path);
     let png_path = format!("{}.png", args.spine_path);
     let skel_path = format!("{}.skel", args.spine_path);
 
-    if !Path::new(&atlas_path).exists() {
-        anyhow::bail!("Atlas文件不存在: {}", atlas_path);
-    }
+    // PNG文件是必需的
     if !Path::new(&png_path).exists() {
         anyhow::bail!("PNG文件不存在: {}", png_path);
     }
-    if !Path::new(&skel_path).exists() {
-        anyhow::bail!("Skel文件不存在: {}", skel_path);
-    }
+
+    // 检查其他文件是否存在
+    let has_atlas = Path::new(&atlas_path).exists();
+    let has_skel = Path::new(&skel_path).exists();
 
     // 获取文件名（不包含路径）
     let spine_name = Path::new(&args.spine_path)
@@ -82,7 +81,7 @@ fn main() -> Result<()> {
         };
 
         // 复制文件
-        file_manager.copy_spine_files(&dir_name, &atlas_path, &png_path, &skel_path)?;
+        file_manager.copy_files(&dir_name, &atlas_path, &skel_path, has_atlas, has_skel)?;
 
         // 在PNG上绘制数字
         let output_png_path = format!("{}/{}/{}.png", args.output_dir, dir_name, spine_name);

@@ -23,7 +23,12 @@ impl FileManager {
 
         // 创建每个子目录
         for i in 1..=count {
-            let dir_name = format!("{}_{:02}", self.spine_name, i);
+            // 根据数量决定数字格式：超过99个使用3位数字，否则使用2位数字
+            let dir_name = if count > 99 {
+                format!("{}_{:03}", self.spine_name, i)
+            } else {
+                format!("{}_{:02}", self.spine_name, i)
+            };
             let dir_path = format!("{}/{}", self.output_dir, dir_name);
 
             if Path::new(&dir_path).exists() {
@@ -35,6 +40,34 @@ impl FileManager {
         Ok(())
     }
 
+    pub fn copy_files(
+        &self,
+        dir_name: &str,
+        atlas_path: &str,
+        skel_path: &str,
+        has_atlas: bool,
+        has_skel: bool,
+    ) -> Result<()> {
+        let target_dir = format!("{}/{}", self.output_dir, dir_name);
+
+        // 如果atlas文件存在，则复制
+        if has_atlas {
+            let atlas_target = format!("{}/{}.atlas", target_dir, self.spine_name);
+            fs::copy(atlas_path, &atlas_target)?;
+        }
+
+        // 如果skel文件存在，则复制
+        if has_skel {
+            let skel_target = format!("{}/{}.skel", target_dir, self.spine_name);
+            fs::copy(skel_path, &skel_target)?;
+        }
+
+        // PNG文件会在图片处理模块中处理，这里不需要复制
+
+        Ok(())
+    }
+
+    // 保留旧方法以保持向后兼容
     pub fn copy_spine_files(
         &self,
         dir_name: &str,
@@ -42,18 +75,6 @@ impl FileManager {
         _png_path: &str,
         skel_path: &str,
     ) -> Result<()> {
-        let target_dir = format!("{}/{}", self.output_dir, dir_name);
-
-        // 复制atlas文件
-        let atlas_target = format!("{}/{}.atlas", target_dir, self.spine_name);
-        fs::copy(atlas_path, &atlas_target)?;
-
-        // 复制skel文件
-        let skel_target = format!("{}/{}.skel", target_dir, self.spine_name);
-        fs::copy(skel_path, &skel_target)?;
-
-        // PNG文件会在图片处理模块中处理，这里不需要复制
-
-        Ok(())
+        self.copy_files(dir_name, atlas_path, skel_path, true, true)
     }
 }
