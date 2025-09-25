@@ -22,6 +22,10 @@ impl ControlPanel {
             .min_width(250.0)
             .max_width(400.0)
             .show(ctx, |ui| {
+                // 获取可用宽度，确保所有元素使用一致的宽度
+                let available_width = ui.available_width();
+                let button_width = (available_width - 20.0) / 2.0; // 减去间距
+
                 // 上部：确认和取消按钮
                 ui.group(|ui| {
                     ui.set_min_height(ui.available_height() * 0.2);
@@ -31,10 +35,7 @@ impl ControlPanel {
 
                         ui.horizontal(|ui| {
                             if ui
-                                .add_sized(
-                                    [ui.available_width() * 0.45, 40.0],
-                                    egui::Button::new("✅ 确认"),
-                                )
+                                .add_sized([button_width, 40.0], egui::Button::new("✅ 确认"))
                                 .clicked()
                             {
                                 selection_handler.confirm_selection(
@@ -45,10 +46,7 @@ impl ControlPanel {
                             }
 
                             if ui
-                                .add_sized(
-                                    [ui.available_width() * 0.45, 40.0],
-                                    egui::Button::new("❌ 取消"),
-                                )
+                                .add_sized([button_width, 40.0], egui::Button::new("❌ 取消"))
                                 .clicked()
                             {
                                 ctx.send_viewport_cmd(egui::ViewportCommand::Close);
@@ -68,6 +66,7 @@ impl ControlPanel {
 
                         // 选择框开关
                         ui.horizontal(|ui| {
+                            ui.set_min_width(available_width - 20.0); // 设置最小宽度保持一致
                             let mut enable_selection = selection_handler.get_enable_selection();
                             ui.checkbox(&mut enable_selection, "启用选择框");
                             selection_handler.set_enable_selection(enable_selection);
@@ -102,6 +101,7 @@ impl ControlPanel {
                                 ui.label("文字朝向:");
                                 let mut current_direction = selection_handler.get_text_direction();
                                 egui::ComboBox::from_id_source("text_direction")
+                                    .width(available_width - 100.0) // 设置固定宽度
                                     .selected_text(current_direction.as_str())
                                     .show_ui(ui, |ui| {
                                         ui.selectable_value(
@@ -138,6 +138,7 @@ impl ControlPanel {
                                 ui.label("文字朝向:");
                                 let mut current_direction = selection_handler.get_text_direction();
                                 egui::ComboBox::from_id_source("text_direction")
+                                    .width(available_width - 100.0) // 设置固定宽度
                                     .selected_text(current_direction.as_str())
                                     .show_ui(ui, |ui| {
                                         ui.selectable_value(
@@ -176,6 +177,7 @@ impl ControlPanel {
                         ui.add_space(10.0);
 
                         ui.horizontal(|ui| {
+                            ui.set_min_width(available_width - 20.0); // 设置最小宽度保持一致
                             let mut text_color = selection_handler.get_text_color();
                             egui::color_picker::color_picker_color32(
                                 ui,
@@ -203,6 +205,7 @@ impl ControlPanel {
 
                         // 颜色变化开关
                         ui.horizontal(|ui| {
+                            ui.set_min_width(available_width - 20.0); // 设置最小宽度保持一致
                             let mut enable_color_variation =
                                 selection_handler.get_enable_color_variation();
                             ui.checkbox(&mut enable_color_variation, "启用颜色变化");
