@@ -44,9 +44,6 @@ fn main() -> Result<()> {
     let has_atlas = Path::new(&atlas_path).exists();
     let has_skel = Path::new(&skel_path).exists();
 
-    // 检测是否为单图片模式（只有PNG文件，没有atlas和skel文件）
-    let is_single_image_mode = !has_atlas && !has_skel;
-
     // 获取文件名（不包含路径）
     let spine_name = Path::new(&args.spine_path)
         .file_stem()
@@ -65,7 +62,7 @@ fn main() -> Result<()> {
     );
 
     // 创建输出目录
-    let file_manager = FileManager::new(&args.output_dir, &spine_name, is_single_image_mode);
+    let file_manager = FileManager::new(&args.output_dir, &spine_name, has_atlas || has_skel);
     file_manager.create_output_dirs(args.count)?;
 
     // 处理每个文件
@@ -83,16 +80,16 @@ fn main() -> Result<()> {
             (format!("{}_{}", spine_name, formatted_num), formatted_num)
         };
 
-        // 复制文件（在非单图片模式下）
+        // 复制文件（如果存在同名文件）
         file_manager.copy_files(&dir_name, &atlas_path, &skel_path, has_atlas, has_skel)?;
 
         // 在PNG上绘制数字
-        let output_png_path = if is_single_image_mode {
-            // 单图片模式：直接在output目录下生成带编号的图片
-            format!("{}/{}_{}.png", args.output_dir, spine_name, number_text)
-        } else {
-            // 多文件模式：在子目录中生成图片
+        let output_png_path = if has_atlas || has_skel {
+            // 如果有其他文件：在子目录中生成图片
             format!("{}/{}/{}.png", args.output_dir, dir_name, spine_name)
+        } else {
+            // 如果只有PNG文件：直接在output目录下生成带编号的图片
+            format!("{}/{}_{}.png", args.output_dir, spine_name, number_text)
         };
 
         image_processor.draw_text_in_rect_with_color_variation(
@@ -105,10 +102,10 @@ fn main() -> Result<()> {
         )?;
     }
 
-    if is_single_image_mode {
-        println!("处理完成！在output目录下生成了 {} 个图片文件。", args.count);
-    } else {
+    if has_atlas || has_skel {
         println!("处理完成！生成了 {} 个目录。", args.count);
+    } else {
+        println!("处理完成！在output目录下生成了 {} 个图片文件。", args.count);
     }
     Ok(())
 }
