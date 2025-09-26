@@ -30,12 +30,12 @@ impl ControlPanel {
                 ui.group(|ui| {
                     ui.set_min_height(100.0); // 设置固定高度，更合适
                     ui.vertical_centered(|ui| {
-                        ui.heading("操作");
+                        ui.heading("Operations");
                         ui.add_space(10.0);
 
                         ui.horizontal(|ui| {
                             if ui
-                                .add_sized([button_width, 40.0], egui::Button::new("✅ 确认"))
+                                .add_sized([button_width, 40.0], egui::Button::new("✅ Confirm"))
                                 .clicked()
                             {
                                 selection_handler.confirm_selection(
@@ -46,7 +46,7 @@ impl ControlPanel {
                             }
 
                             if ui
-                                .add_sized([button_width, 40.0], egui::Button::new("❌ 取消"))
+                                .add_sized([button_width, 40.0], egui::Button::new("❌ Cancel"))
                                 .clicked()
                             {
                                 ctx.send_viewport_cmd(egui::ViewportCommand::Close);
@@ -61,14 +61,14 @@ impl ControlPanel {
                 ui.group(|ui| {
                     ui.set_min_height(ui.available_height() * 0.25);
                     ui.vertical(|ui| {
-                        ui.heading("选择区域");
+                        ui.heading("Selection Area");
                         ui.add_space(10.0);
 
                         // 选择框开关
                         ui.horizontal(|ui| {
                             ui.set_min_width(available_width - 20.0); // 设置最小宽度保持一致
                             let mut enable_selection = selection_handler.get_enable_selection();
-                            ui.checkbox(&mut enable_selection, "启用选择框");
+                            ui.checkbox(&mut enable_selection, "Enable Selection");
                             selection_handler.set_enable_selection(enable_selection);
                         });
 
@@ -77,11 +77,11 @@ impl ControlPanel {
 
                             // 状态显示
                             if selection_handler.is_selecting() {
-                                ui.label("✅ 正在选择矩形区域...");
+                                ui.label("✅ Selecting rectangle region...");
                             } else if selection_handler.has_selection() {
-                                ui.label("✅ 已选择矩形区域");
+                                ui.label("✅ Rectangle region selected");
                             } else {
-                                ui.label("请先在图片上拖拽选择矩形区域");
+                                ui.label("Please drag on the image to select a rectangle region");
                             }
 
                             // 显示当前选择信息
@@ -89,16 +89,16 @@ impl ControlPanel {
                                 selection_handler.get_selection_info(image_display.get_image_size())
                             {
                                 ui.add_space(5.0);
-                                ui.label("选择区域信息:");
+                                ui.label("Selection area info:");
                                 ui.label(format!("X: {:.0}, Y: {:.0}", x, y));
-                                ui.label(format!("宽度: {:.0}, 高度: {:.0}", width, height));
+                                ui.label(format!("Width: {:.0}, Height: {:.0}", width, height));
                             }
 
                             ui.add_space(10.0);
 
                             // 文字朝向选择
                             ui.horizontal(|ui| {
-                                ui.label("文字朝向:");
+                                ui.label("Text Direction:");
                                 let mut current_direction = selection_handler.get_text_direction();
                                 egui::ComboBox::from_id_source("text_direction")
                                     .width(available_width - 100.0) // 设置固定宽度
@@ -107,35 +107,35 @@ impl ControlPanel {
                                         ui.selectable_value(
                                             &mut current_direction,
                                             TextDirection::Up,
-                                            "向上",
+                                            "Up",
                                         );
                                         ui.selectable_value(
                                             &mut current_direction,
                                             TextDirection::Down,
-                                            "向下",
+                                            "Down",
                                         );
                                         ui.selectable_value(
                                             &mut current_direction,
                                             TextDirection::Left,
-                                            "向左",
+                                            "Left",
                                         );
                                         ui.selectable_value(
                                             &mut current_direction,
                                             TextDirection::Right,
-                                            "向右",
+                                            "Right",
                                         );
                                     });
                                 selection_handler.set_text_direction(current_direction);
                             });
                         } else {
                             ui.add_space(10.0);
-                            ui.label("将使用整个图片区域");
+                            ui.label("Will use the entire image area");
 
                             ui.add_space(10.0);
 
                             // 文字朝向选择（即使没有选择框也显示）
                             ui.horizontal(|ui| {
-                                ui.label("文字朝向:");
+                                ui.label("Text Direction:");
                                 let mut current_direction = selection_handler.get_text_direction();
                                 egui::ComboBox::from_id_source("text_direction")
                                     .width(available_width - 100.0) // 设置固定宽度
@@ -144,22 +144,22 @@ impl ControlPanel {
                                         ui.selectable_value(
                                             &mut current_direction,
                                             TextDirection::Up,
-                                            "向上",
+                                            "Up",
                                         );
                                         ui.selectable_value(
                                             &mut current_direction,
                                             TextDirection::Down,
-                                            "向下",
+                                            "Down",
                                         );
                                         ui.selectable_value(
                                             &mut current_direction,
                                             TextDirection::Left,
-                                            "向左",
+                                            "Left",
                                         );
                                         ui.selectable_value(
                                             &mut current_direction,
                                             TextDirection::Right,
-                                            "向右",
+                                            "Right",
                                         );
                                     });
                                 selection_handler.set_text_direction(current_direction);
@@ -173,7 +173,7 @@ impl ControlPanel {
                 // 文字颜色选择区域
                 ui.group(|ui| {
                     ui.vertical(|ui| {
-                        ui.heading("文字颜色");
+                        ui.heading("Text Color");
                         ui.add_space(10.0);
 
                         ui.horizontal(|ui| {
@@ -200,7 +200,7 @@ impl ControlPanel {
                 // 下部：颜色变化区域
                 ui.group(|ui| {
                     ui.vertical(|ui| {
-                        ui.heading("颜色变化");
+                        ui.heading("Color Variation");
                         ui.add_space(10.0);
 
                         // 颜色变化开关
@@ -208,17 +208,17 @@ impl ControlPanel {
                             ui.set_min_width(available_width - 20.0); // 设置最小宽度保持一致
                             let mut enable_color_variation =
                                 selection_handler.get_enable_color_variation();
-                            ui.checkbox(&mut enable_color_variation, "启用颜色变化");
+                            ui.checkbox(&mut enable_color_variation, "Enable Color Variation");
                             selection_handler.set_enable_color_variation(enable_color_variation);
                         });
 
                         if selection_handler.get_enable_color_variation() {
                             ui.add_space(10.0);
-                            ui.label("每个生成的图片将自动叠加不同的HSL颜色");
-                            ui.label("颜色将根据图片数量均匀分布");
+                            ui.label("Each generated image will automatically overlay different HSL colors");
+                            ui.label("Colors will be evenly distributed based on the number of images");
                         } else {
                             ui.add_space(10.0);
-                            ui.label("将使用原始图片颜色");
+                            ui.label("Will use the original image colors");
                         }
                     });
                 });

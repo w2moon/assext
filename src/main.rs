@@ -35,9 +35,9 @@ fn main() -> Result<()> {
     let png_path = format!("{}.png", args.spine_path);
     let skel_path = format!("{}.skel", args.spine_path);
 
-    // PNG文件是必需的
+    // PNG file is required
     if !Path::new(&png_path).exists() {
-        anyhow::bail!("PNG文件不存在: {}", png_path);
+        anyhow::bail!("PNG file does not exist: {}", png_path);
     }
 
     // 检查其他文件是否存在
@@ -57,7 +57,7 @@ fn main() -> Result<()> {
     let rect = RectSelector::select_rect(&png_path)?;
 
     println!(
-        "选择的矩形区域: x={}, y={}, width={}, height={}",
+        "Selected rectangle region: x={}, y={}, width={}, height={}",
         rect.x, rect.y, rect.width, rect.height
     );
 
@@ -103,9 +103,15 @@ fn main() -> Result<()> {
     }
 
     if has_atlas || has_skel {
-        println!("处理完成！生成了 {} 个目录。", args.count);
+        println!(
+            "Processing completed! Generated {} directories.",
+            args.count
+        );
     } else {
-        println!("处理完成！在output目录下生成了 {} 个图片文件。", args.count);
+        println!(
+            "Processing completed! Generated {} image files in output directory.",
+            args.count
+        );
     }
     Ok(())
 }

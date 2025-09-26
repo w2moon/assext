@@ -42,7 +42,7 @@ impl ImageProcessor {
         // 加载系统字体
         let font = self
             .load_system_font()
-            .ok_or_else(|| anyhow::anyhow!("无法加载字体"))?;
+            .ok_or_else(|| anyhow::anyhow!("Failed to load font"))?;
 
         // 根据文字朝向绘制文字
         self.draw_text_with_direction(&mut rgba_img, text, &font, font_size, rect, rect.text_color);

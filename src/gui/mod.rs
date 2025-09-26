@@ -14,19 +14,19 @@ use std::sync::{Arc, Mutex};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TextDirection {
-    Up,    // 向上
-    Down,  // 向下
-    Left,  // 向左
-    Right, // 向右
+    Up,    // Up
+    Down,  // Down
+    Left,  // Left
+    Right, // Right
 }
 
 impl TextDirection {
     pub fn as_str(&self) -> &'static str {
         match self {
-            TextDirection::Up => "向上",
-            TextDirection::Down => "向下",
-            TextDirection::Left => "向左",
-            TextDirection::Right => "向右",
+            TextDirection::Up => "Up",
+            TextDirection::Down => "Down",
+            TextDirection::Left => "Left",
+            TextDirection::Right => "Right",
         }
     }
 }
@@ -73,17 +73,17 @@ impl RectSelector {
         };
 
         eframe::run_native(
-            "选择矩形区域",
+            "Select Rectangle Region",
             options,
             Box::new(move |cc| {
                 setup_custom_fonts(&cc.egui_ctx);
                 Box::new(selector)
             }),
         )
-        .map_err(|e| anyhow::anyhow!("GUI错误: {}", e))?;
+        .map_err(|e| anyhow::anyhow!("GUI error: {}", e))?;
 
         let result = selected_rect.lock().unwrap().take();
-        result.ok_or_else(|| anyhow::anyhow!("未选择矩形区域"))
+        result.ok_or_else(|| anyhow::anyhow!("No rectangle region selected"))
     }
 }
 

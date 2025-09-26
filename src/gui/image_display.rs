@@ -64,7 +64,7 @@ impl ImageDisplay {
                 selection_handler.draw_selection_rect(ui, actual_image_rect);
             }
         } else {
-            ui.label("正在加载图片...");
+            ui.label("Loading image...");
         }
     }
 
