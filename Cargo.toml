@@ -1,6 +1,6 @@
 [package]
 name = "assext"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["pengwang <your-email@example.com>"]
 description = "Asset file extension tool - A Spine file processing tool that generates numbers in specified regions"

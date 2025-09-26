@@ -11,11 +11,16 @@ A command-line tool written in Rust for processing Asset files and generating nu
   - **Multi-file mode**: Generate multiple directories, each containing complete Spine files
   - **Single-image mode**: Generate numbered image files directly in the output directory
 
+## Installation
+
+```bash
+cargo install assext
+```
+
 ## Usage
 
 ```bash
-cargo build
-./target/debug/assext <SPINE_PATH> <OUTPUT_DIR> <COUNT>
+assext <SPINE_PATH> <OUTPUT_DIR> <COUNT>
 ```
 
 ### Parameters
@@ -33,7 +38,7 @@ The program automatically selects the output mode based on input files:
 When the input path contains `.atlas` and/or `.skel` files, the program uses multi-file mode.
 
 ```bash
-./target/debug/assext ./data/lixiaolong output 3
+assext ./data/lixiaolong output 3
 ```
 
 This will:
@@ -54,7 +59,7 @@ This will:
 When the input path contains only `.png` files, the program uses single-image mode.
 
 ```bash
-./target/debug/assext ./datasingle/lixiaolong output 3
+assext ./datasingle/lixiaolong output 3
 ```
 
 This will:
@@ -79,9 +84,11 @@ This will:
 - Rust 1.70+
 - System fonts (Arial, Helvetica, etc.)
 
-## Building
+## Building from Source
 
 ```bash
+git clone <repository-url>
+cd assext
 cargo build --release
 ```
 
