@@ -1,113 +1,113 @@
-# Assext - Asset 文件扩展工具
+# Assext - Asset File Extension Tool
 
-这是一个用 Rust 编写的命令行工具，用于处理 Asset 文件，在指定区域生成数字。
+A command-line tool written in Rust for processing Asset files and generating numbers in specified regions.
 
-## 功能
+## Features
 
-- 读取 Spine 文件（.atlas, .png, .skel）或单张图片文件
-- 通过 GUI 窗口让用户选择图片上的矩形区域
-- 在指定矩形区域内自动调整大小绘制数字
-- 支持两种输出模式：
-  - **多文件模式**：生成多个目录，每个目录包含完整的 Spine 文件
-  - **单图片模式**：直接在输出目录下生成带编号的图片文件
+- Read Spine files (.atlas, .png, .skel) or single image files
+- Allow users to select rectangular regions on images through a GUI window
+- Automatically adjust and draw numbers within specified rectangular regions
+- Support two output modes:
+  - **Multi-file mode**: Generate multiple directories, each containing complete Spine files
+  - **Single-image mode**: Generate numbered image files directly in the output directory
 
-## 使用方法
+## Usage
 
 ```bash
 cargo build
 ./target/debug/assext <SPINE_PATH> <OUTPUT_DIR> <COUNT>
 ```
 
-### 参数说明
+### Parameters
 
-- `SPINE_PATH`: Spine 文件路径（不包含扩展名）或单张图片路径，例如: `./data/lixiaolong` 或 `./datasingle/lixiaolong`
-- `OUTPUT_DIR`: 输出目录，例如: `output`
-- `COUNT`: 生成的文件数量，例如: `3`
+- `SPINE_PATH`: Spine file path (without extension) or single image path, e.g., `./data/lixiaolong` or `./datasingle/lixiaolong`
+- `OUTPUT_DIR`: Output directory, e.g., `output`
+- `COUNT`: Number of files to generate, e.g., `3`
 
-### 使用模式
+### Usage Modes
 
-程序会根据输入文件自动选择输出模式：
+The program automatically selects the output mode based on input files:
 
-#### 多文件模式（完整 Spine 文件）
+#### Multi-file Mode (Complete Spine Files)
 
-当输入路径包含 `.atlas` 和/或 `.skel` 文件时，程序会使用多文件模式。
+When the input path contains `.atlas` and/or `.skel` files, the program uses multi-file mode.
 
 ```bash
 ./target/debug/assext ./data/lixiaolong output 3
 ```
 
-这将：
+This will:
 
-1. 打开一个 GUI 窗口显示 `lixiaolong.png` 图片
-2. 让用户在图片上拖拽选择矩形区域
-3. 在 `output/` 目录下创建 3 个子目录：
+1. Open a GUI window displaying the `lixiaolong.png` image
+2. Allow users to drag and select a rectangular region on the image
+3. Create 3 subdirectories in the `output/` directory:
    - `lixiaolong_01/`
    - `lixiaolong_02/`
    - `lixiaolong_03/`
-4. 每个目录包含：
-   - `lixiaolong.atlas` (复制的原文件)
-   - `lixiaolong.png` (在指定区域绘制了对应数字的图片)
-   - `lixiaolong.skel` (复制的原文件)
+4. Each directory contains:
+   - `lixiaolong.atlas` (copied original file)
+   - `lixiaolong.png` (image with corresponding number drawn in the specified region)
+   - `lixiaolong.skel` (copied original file)
 
-#### 单图片模式（仅 PNG 文件）
+#### Single-image Mode (PNG Files Only)
 
-当输入路径只包含 `.png` 文件时，程序会使用单图片模式。
+When the input path contains only `.png` files, the program uses single-image mode.
 
 ```bash
 ./target/debug/assext ./datasingle/lixiaolong output 3
 ```
 
-这将：
+This will:
 
-1. 打开一个 GUI 窗口显示 `lixiaolong.png` 图片
-2. 让用户在图片上拖拽选择矩形区域
-3. 直接在 `output/` 目录下生成 3 个图片文件：
+1. Open a GUI window displaying the `lixiaolong.png` image
+2. Allow users to drag and select a rectangular region on the image
+3. Generate 3 image files directly in the `output/` directory:
    - `lixiaolong_01.png`
    - `lixiaolong_02.png`
    - `lixiaolong_03.png`
 
-## GUI 使用说明
+## GUI Usage Instructions
 
-1. 程序启动后会打开一个窗口显示 Spine 图片
-2. 在图片上拖拽鼠标选择矩形区域
-3. 红色边框会显示当前选择的区域
-4. 点击"确认选择"按钮确认选择
-5. 点击"取消"按钮退出程序
+1. The program will open a window displaying the Spine image upon startup
+2. Drag the mouse on the image to select a rectangular region
+3. A red border will show the currently selected region
+4. Click the "Confirm" button to confirm the selection
+5. Click the "Cancel" button to exit the program
 
-## 依赖
+## Dependencies
 
 - Rust 1.70+
-- 系统字体（Arial, Helvetica 等）
+- System fonts (Arial, Helvetica, etc.)
 
-## 构建
+## Building
 
 ```bash
 cargo build --release
 ```
 
-## 更新日志
+## Changelog
 
 ### v0.2.0
 
-- 新增单图片模式支持
-- 当输入目录只包含 PNG 文件时，直接在输出目录下生成带编号的图片文件
-- 不再创建子目录，简化输出结构
-- 自动检测输入文件类型并选择合适的输出模式
+- Added single-image mode support
+- When input directory contains only PNG files, generate numbered image files directly in the output directory
+- No longer creates subdirectories, simplifying output structure
+- Automatically detect input file types and select appropriate output mode
 
 ### v0.1.0
 
-- 初始版本
-- 支持完整的 Spine 文件处理
-- GUI 矩形区域选择
-- 多目录输出模式
+- Initial version
+- Support for complete Spine file processing
+- GUI rectangular region selection
+- Multi-directory output mode
 
-## 注意事项
+## Notes
 
-- 确保输入文件存在：
-  - 多文件模式：需要 `.png` 文件，`.atlas` 和 `.skel` 文件可选
-  - 单图片模式：只需要 `.png` 文件
-- GUI 窗口需要在有图形界面的环境中运行
-- 程序会自动调整文字大小以适应选择的矩形区域
-- 生成的数字会居中显示在矩形区域内
-- 程序会根据输入文件类型自动选择输出模式
-- 数字格式：1-99 使用 2 位数字（01, 02, 03...），100+ 使用 3 位数字（001, 002, 003...）
+- Ensure input files exist:
+  - Multi-file mode: Requires `.png` file, `.atlas` and `.skel` files are optional
+  - Single-image mode: Only requires `.png` file
+- GUI window needs to run in an environment with a graphical interface
+- The program automatically adjusts text size to fit the selected rectangular region
+- Generated numbers are centered within the rectangular region
+- The program automatically selects output mode based on input file types
+- Number format: 1-99 uses 2-digit format (01, 02, 03...), 100+ uses 3-digit format (001, 002, 003...)
